@@ -1,0 +1,7 @@
+FROM stdnullptr/trinitycore-base:3.3.5
+
+WORKDIR /home/trinity/server
+
+EXPOSE 8085
+
+CMD ["./bin/worldserver"]

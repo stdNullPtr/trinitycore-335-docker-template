@@ -1,0 +1,6 @@
+.idea
+config/*.conf
+data/dbc
+data/maps
+data/mmaps
+data/vmaps

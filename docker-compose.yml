@@ -1,0 +1,54 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: trinity-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: asdf123a
+    volumes:
+      - /var/run/mysqld:/var/run/mysqld
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password
+
+  auth:
+    build:
+      context: .
+      dockerfile: Dockerfile.authserver
+    image: stdnullptr/trinitycore-authserver:3.3.5
+    container_name: trinity-authserver
+    depends_on:
+      - mysql
+    volumes:
+      - /var/run/mysqld:/var/run/mysqld:ro
+      - ./config:/home/trinity/server/etc
+    ports:
+      - "3724:3724"
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+  world:
+    build:
+      context: .
+      dockerfile: Dockerfile.worldserver
+    image: stdnullptr/trinitycore-worldserver:3.3.5
+    container_name: trinity-worldserver
+    depends_on:
+      - mysql
+      - auth
+    volumes:
+      - /var/run/mysqld:/var/run/mysqld:ro
+      - ./config:/home/trinity/server/etc
+      - ./data:/home/trinity/server/data
+      # Optional: Mount TDB file on first run
+      # - ./TDB/TDB_full_world_335.24111_2024_11_22.sql:/home/trinity/server/TDB_full_world_335.24111_2024_11_22.sql:ro
+    ports:
+      - "8085:8085"
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+volumes:
+  mysql_data:

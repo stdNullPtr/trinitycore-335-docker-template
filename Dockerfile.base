@@ -1,0 +1,47 @@
+FROM ubuntu:24.04
+
+# Update package lists and install build dependencies
+RUN apt-get update && \
+    apt-get install -y \
+        clang \
+        cmake \
+        g++ \
+        gcc \
+        git \
+        libboost-all-dev \
+        libbz2-dev \
+        libmysqlclient-dev \
+        libncurses-dev \
+        libreadline-dev \
+        libssl-dev \
+        make \
+        mysql-server \
+        p7zip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set clang as default compiler
+RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100 && \
+    update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100
+
+# Create a non-root user for TrinityCore
+RUN useradd -m -s /bin/bash trinity
+
+# Switch to trinity user for all subsequent operations
+USER trinity
+WORKDIR /home/trinity
+
+RUN git clone -b 3.3.5 --depth 1 https://github.com/TrinityCore/TrinityCore.git
+
+RUN mkdir -p /home/trinity/TrinityCore/build
+
+# Set working directory to build folder
+WORKDIR /home/trinity/TrinityCore/build
+
+RUN cmake ../ -DCMAKE_INSTALL_PREFIX=/home/trinity/server -DTOOLS=0 -DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+# Build TrinityCore (use -j to parallelize for faster builds)
+RUN make -j$(nproc)
+
+RUN make install
+
+WORKDIR /home/trinity/server

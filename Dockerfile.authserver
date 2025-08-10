@@ -1,0 +1,7 @@
+FROM stdnullptr/trinitycore-base:3.3.5
+
+WORKDIR /home/trinity/server
+
+EXPOSE 3724
+
+CMD ["./bin/authserver"]
