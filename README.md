@@ -92,6 +92,9 @@ Edit the configuration files in `./config/`:
 
 ### 6. Initialize Databases
 
+TODO: add instructions for initializing databases using the tools provided by TrinityCore's compilation.  
+They are present in the docker image but not yet documented.
+
 Run the creation scripts to create the databases and tables: https://trinitycore.info/en/install/Database-Installation
 
 ### 7. Start the Servers
